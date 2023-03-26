@@ -5,11 +5,9 @@ const initialAuthState = { isAuth: false };
 
 /**
  * Auth Slice
- *
  */
 const authSlice = createSlice({
    name: "auth",
-
    initialState: initialAuthState,
    reducers: {
       login(state) {

@@ -8,6 +8,7 @@ host: localhost:3001
 basePath: /api/v1
 schemes:
    - http
+   - https
 paths:
    /user/login:
       post:
@@ -58,7 +59,7 @@ paths:
             "500":
                description: Internal Server Error
    /user/profile:
-      post:
+      get:
          security:
             - Bearer: []
          tags:
@@ -70,6 +71,7 @@ paths:
               name: Authorization
               description: Attach Bearer JWT token
               required: true
+              type: string
          produces:
             - application/json
          responses:
@@ -93,6 +95,7 @@ paths:
               name: Authorization
               description: Attach Bearer JWT token
               required: true
+              type: string
             - in: body
               name: body
               description: Update user profile attributes
@@ -111,196 +114,145 @@ paths:
             "500":
                description: Internal Server Error
 
-               /user/transactions/{transactionsAccountID}:
+   /accounts/{accountid}:
       get:
          security:
             - Bearer: []
          tags:
-            - Acount checking transactions
-         summary: User transactions API
-         description: API for account checking Transactions
+            - Transactions module
+         summary: Transactions API
+         description: API for fetching transactions by account ID.return all transactions for a specific account.
          parameters:
-            - in: header
-              name: Authorization
-              description: Attach Bearer JWT token
-              type: string
+            - in: path
+              name: accountid
               required: true
-
-            - name: transactionsAccountID
-              in: path
-              required: true
-              description: Account transactions
               type: integer
-
+              description: The account ID
          produces:
             - application/json
          responses:
             "200":
-               description: Detail transactions successfully
+               description: Transactions retrieved successfully
                schema:
-                  $ref: "#/definitions/TransactionsAccount"
+                  $ref: "#/definitions/ApiTransactionsResponse"
             "400":
-               description: Invalid Fields
+               description: Bad request
+            "404":
+               description: Account not found
             "500":
                description: Internal Server Error
 
-   /user/transactions/{transactionsAccountID}/{transactionID}:
-      get:
-         security:
-            - Bearer: []
-         tags:
-            - Acount checking transactions
-         summary: User transaction API
-         description: API for account checking Transaction
-         parameters:
-            - in: header
-              name: Authorization
-              description: Attach Bearer JWT token
-              type: string
-              required: true
-
-            - name: transactionsAccountID
-              in: path
-              required: true
-              description: Account transactions
-              type: integer
-
-            - name: transactionID
-              in: path
-              required: true
-              description: transaction detail
-              type: integer
-         produces:
-            - application/json
-         responses:
-            "200":
-               description: Detail transaction successfully
-               schema:
-                  $ref: "#/definitions/TransactionDetail"
-            "400":
-               description: Invalid Fields
-            "500":
-               description: Internal Server Error
-
+   /accounts/{accountid}/transactions/{transactionId}:
       put:
          security:
             - Bearer: []
          tags:
-            - Acount checking transactions
-         summary: User transaction Informations API
-         description: API for Informations Transaction
+            - Transactions module
+         summary: Transactions API
+         description: Update and return a transaction's description or category based on its ID
          parameters:
-            - in: header
-              name: Authorization
-              description: Attach Bearer JWT token
-              type: string
+            - in: path
+              name: accountid
               required: true
-
-            - name: transactionsAccountID
-              in: path
-              required: true
-              description: Account transactions
               type: integer
-
-            - name: transactionID
-              in: path
+              description: The account ID
+            - in: path
+              name: transactionId
+              type: number
               required: true
-              description: modified information
-              type: integer
-
-            - name: param
-              in: body
+            - in: body
+              name: body
+              description: Update transaction's attributes
+              required: true
               schema:
-                 $ref: "#/definitions/TransactionInformation"
+                 $ref: "#/definitions/TransactionUpdate"
          produces:
             - application/json
          responses:
             "200":
-               description: modified information Successfully
+               description: transaction updated successfully
                schema:
-                  $ref: "#/definitions/TransactionMessage"
-
+                  $ref: "#/definitions/ApiTransactionsResponse"
             "400":
                description: Invalid Fields
+            "404":
+               description: Transaction not found
             "500":
                description: Internal Server Error
 
-      delete:
-         security:
-            - Bearer: []
-         tags:
-            - Acount checking transactions
-         summary: User transaction Informations API
-         description: API for Informations Transaction
-         parameters:
-            - in: header
-              name: Authorization
-              description: Attach Bearer JWT token
-              type: string
-              required: true
-
-            - name: transactionsAccountID
-              in: path
-              required: true
-              description: Account transactions
-              type: integer
-
-            - name: transactionID
-              in: path
-              required: true
-              description: information removed
-              type: integer
-         produces:
-            - application/json
-         responses:
-            "200":
-               description: information removed Successfully
-               schema:
-                  $ref: "#/definitions/TransactionMessage"
-
-            "400":
-               description: Invalid Fields
-            "500":
-               description: Internal Server Error
-
+               /accounts/{accountid}/transactions/{transactionId}:
       post:
          security:
             - Bearer: []
          tags:
-            - Acount checking transactions
-         summary: User transaction Informations API
-         description: API for Informations Transaction
+            - Transactions module
+         summary: Transactions API
+         description: Create a transaction's description or category based on its ID
          parameters:
-            - in: header
-              name: Authorization
-              description: Attach Bearer JWT token
-              type: string
+            - in: path
+              name: accountid
               required: true
-
-            - name: transactionsAccountID
-              in: path
-              required: true
-              description: Account transactions
               type: integer
-
-            - name: transactionID
-              in: path
+              description: The account ID
+            - in: path
+              name: transactionId
+              type: number
               required: true
-              description: information created
-              type: integer
-            - name: param
-              in: body
+            - in: body
+              name: body
+              description: Create transaction's attributes
+              required: true
               schema:
-                 $ref: "#/definitions/TransactionInformation"
+                 $ref: "#/definitions/TransactionCreate"
          produces:
             - application/json
          responses:
             "200":
-               description: information created Successfully
+               description: transaction creation successfull
                schema:
-                  $ref: "#/definitions/TransactionMessage"
+                  $ref: "#/definitions/ApiTransactionsResponse"
             "400":
                description: Invalid Fields
+            "404":
+               description: Transaction not found
+            "500":
+               description: Internal Server Error
+
+               /accounts/{accountid}/transactions/{transactionId}:
+      delete:
+         security:
+            - Bearer: []
+         tags:
+            - Transactions module
+         summary: Transactions API
+         description: Delete a transaction's description or category based on its ID
+         parameters:
+            - in: path
+              name: accountid
+              required: true
+              type: integer
+              description: The account ID
+            - in: path
+              name: transactionId
+              type: number
+              required: true
+            - in: body
+              name: body
+              description: Delete transaction's attributes
+              required: true
+              schema:
+                 $ref: "#/definitions/TransactionDelete"
+         produces:
+            - application/json
+         responses:
+            "200":
+               description: transaction Delete successfull
+               schema:
+                  $ref: "#/definitions/ApiTransactionsResponse"
+            "400":
+               description: Invalid Fields
+            "404":
+               description: Transaction not found
             "500":
                description: Internal Server Error
 
@@ -358,3 +310,51 @@ definitions:
             type: string
          lastName:
             type: string
+   Transaction:
+      type: array
+      items:
+         type: object
+         properties:
+            id:
+               type: string
+               description: transaction ID
+            date:
+               type: string
+               description: transaction date
+            description:
+               type: string
+               description: transaction description
+            amount:
+               type: number
+               description: transaction amount
+            balance:
+               type: number
+               description: account balance after transaction
+            transactionType:
+               type: string
+               description: transaction type
+            category:
+               type: string
+               description: transaction category
+            notes:
+               type: string
+               description: user's notes for transaction
+
+   ApiTransactionsResponse:
+      type: object
+      properties:
+         status:
+            type: integer
+         message:
+            type: string
+         body:
+            $ref: "#/definitions/Transaction"
+   TransactionUpdate:
+      type: object
+      properties:
+         category:
+            type: string
+            description: transaction category
+         notes:
+            type: string
+            description: user notes about the transaction

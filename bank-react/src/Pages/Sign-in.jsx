@@ -1,4 +1,3 @@
-import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,11 +17,13 @@ const SignIn = () => {
    const userProfile = useSelector((state) => state.profile);
 
    //Récup input values
-   const [email, setUsername] = useState("");
-   const [password, setPassword] = useState("");
+   const [email, setUsername] = useState(localStorage.getItem("email" || ""));
+   const [password, setPassword] = useState(localStorage.getItem("password" || ""));
+   const [rememberMe, setRememberMe] = useState(false);
 
    const handleSubmit = async (event) => {
       event.preventDefault();
+
       //recup token
       const dataToken = await getToken(email, password);
       // Status = 200, token saved
@@ -34,7 +35,7 @@ const SignIn = () => {
             dispatch(authActions.login());
             //use Login() to connect with user info and token
             const dataUser = await login(dataToken.body.token);
-
+            console.log(dataToken);
             if (dataUser.status === 200) {
                dispatch(
                   profileActions.getNames({
@@ -43,6 +44,8 @@ const SignIn = () => {
                   })
                );
                if (userProfile) {
+                  localStorage.setItem("token", dataToken.body.token);
+                  localStorage.setItem("rememberMe", rememberMe);
                   navigate(`/profile/${dataUser.body.id}`);
                } else {
                   navigate("/*");
@@ -78,7 +81,11 @@ const SignIn = () => {
                         />
                      </div>
                      <div className="input-remember">
-                        <input type="checkbox" name="checkbox" />
+                        <input
+                           type="checkbox"
+                           name="checkbox"
+                           onChange={(e) => setRememberMe(!rememberMe)}
+                        />
                         <label>Remember me</label>
                      </div>
                      <button type="submit" className="sign-in-button">
