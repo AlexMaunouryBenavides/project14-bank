@@ -10,10 +10,7 @@ export default function Header({ header }) {
                <img className="main-nav-logo-image" src={ArgentBankLOGO} alt="Argent Bank Logo" />
             </NavLink>
 
-            <div>
-               {/* ajouter condition pour affichage du sign out quand le login sera pret */}
-               {header}
-            </div>
+            <div>{header}</div>
          </nav>
       </div>
    );
